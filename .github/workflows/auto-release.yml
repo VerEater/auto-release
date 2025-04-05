@@ -1,8 +1,5 @@
 name: auto release
-on:
-  push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+on: push
 jobs:
   release:
     defaults:
