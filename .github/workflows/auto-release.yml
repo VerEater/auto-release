@@ -1,0 +1,29 @@
+name: auto-release
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    defaults:
+      run:
+        shell: bash
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      VERSION: ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.20
+      - run: |
+          go build -ldflags "-X main.version=${VERSION}" -o ${RUNNER_TEMP}/cli go/example/main.go
+      - name: Create Release
+        id: create_release
+        run: |
+          gh release create --title "${VERSION}" --generate-notes
+          gh release upload ${VERSION} ${RUNNER_TEMP}/cli
